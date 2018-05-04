@@ -190,6 +190,8 @@ for T_melt = temps
 %         results(i).aspect_std = std(results(i).aspect);
        
         save(save_name,'results')
+        mphsave(model)
+        clear model data2
     end
 end
 
