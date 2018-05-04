@@ -1,0 +1,54 @@
+#BSUB -W 60:00
+#BSUB -n 20
+#BSUB -R "span[ptile=20]"
+#BSUB -R "rusage[mem=2560]"
+#BSUB -M 2560
+#BSUB -u gustapia06@tamu.edu
+#BSUB -P 082789818096
+#BSUB -N #send email at job end
+##
+
+module load R/3.4.3-intel-2017A-Python-2.7.12-recommended-mt
+module load Matlab/R2018a
+module load Comsol/5.3
+export LM_LICENSE_FILE=$(cat lic.dat)
+cat $LSB_DJOB_HOSTFILE | uniq | grep -v [:/] > hostfile
+
+
+# run Rscript for new datapoints
+Rscript FEAnewrun.R
+
+
+#read and assign K, N0 and DELTAN from iterations.csv
+read K N0 DELTAN <<< $(tail -n 1 iterations.csv | tr ',' ' ')
+
+
+# run comsol and matlab to create new models
+comsol mphserver -silent &
+matlab -nodesktop -nodisplay -nosplash -r "clear;create_comsol_models($K,$N0,$DELTAN);exit"
+
+
+#simulate comsol models
+FEADIR="$SCRATCH/FEA_PCE"
+NI=$(($N0 + 1))
+NF=$(($N0 + $DELTAN))
+
+for i in $(seq $NI $NF)
+do
+	echo ""
+	date	
+	echo "Comsol simulation $i of $NF"
+	comsol -f ./hostfile -nn 1 -nnhost 1 -np 20 batch -inputfile $FEADIR/model$i/model_in_$i.mph -outputfile $FEADIR/model$i/model_out_$i.mph -tmpdir $FEADIR/tmp -recoverydir $FEADIR/recovery > $FEADIR/model$i/comsol_out.txt
+done
+
+
+# run comsol and matlab to get results from new models
+comsol mphserver -silent &
+matlab -nodesktop -nodisplay -nosplash -r "clear;comsol_models_results($K,$N0,$DELTAN);exit"
+
+
+# Fit the model in Rscript
+Rscript fitPCE.R
+
+# Remove the hostfile for next iteration
+rm hostfile

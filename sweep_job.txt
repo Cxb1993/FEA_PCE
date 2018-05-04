@@ -1,0 +1,30 @@
+#BSUB -L /bin/bash            # uses the bash login shell to initialize the job's execution environment.
+#BSUB -J sweep$K
+#BSUB -o stdoutSweep$K.txt
+#BSUB -e stderrSweep$K.txt
+#BSUB -n 60                   # assigns 20 cores for execution.     
+#BSUB -R "span[ptile=20]"     # assigns 20 cores per node.
+#BSUB -M 2560                 # sets to 2800MB the per process enforceable memory limit.
+#BSUB -R 'rusage[mem=2560]'
+#BSUB -W 1:00                 # sets to 240 hours the job's runtime wall-clock limit.
+#BSUB -u gustapia06@tamu.edu # sends email to the specified address (e.g., netid@tamu.edu)
+#BSUB -B -N
+#BSUB -P 082789819580
+
+module load Comsol/5.3
+module load Matlab
+export LM_LICENSE_FILE=$(cat lic.dat)
+more $LSB_DJOB_HOSTFILE |uniq |grep -v [:/] > hostfile.$LSB_JOBID
+
+SWPDIR="$SCRATCH/FEA_PCE/sweep/sweep$K"
+
+rm -rf ~/.comsol/v53/configuration/comsol*
+
+comsol batch -f ./hostfile.$LSB_JOBID -nn 12 -nnhost 4 -np 5 -inputfile $SWPDIR/sweep$K_in.mph -outputfile $SWPDIR/sweep$K_out.mph -tmpdir $SCRATCH/FEA_PCE/tmp/ -recoverydir $SCRATCH/FEA_PCE/recovery/
+
+rm -rf ~/.comsol/v53/configuration/comsol*
+
+comsol mphserver -silent &
+matlab -nodesktop -nodisplay -nosplash -r "clear;postprocess_sweep($K);exit"
+
+rm hostfile.$LSB_JOBID

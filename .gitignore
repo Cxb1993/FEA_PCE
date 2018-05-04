@@ -1,0 +1,17 @@
+# ignore Comsol Models
+*.mph
+
+# ignore std out and err
+std*
+
+# ignore job files
+*.job
+
+# ignore license file
+lic.dat
+
+# ignore hostfiles
+host*
+
+# ignore DS_Store
+**/.DS_Store
