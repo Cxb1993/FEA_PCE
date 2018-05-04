@@ -3,8 +3,8 @@
 #BSUB -o stdoutSweep2.txt
 #BSUB -e stderrSweep2.txt
 #BSUB -n 1                   # assigns 20 cores for execution.     
-#BSUB -M 2560                 # sets to 2800MB the per process enforceable memory limit.
-#BSUB -R 'rusage[mem=2560]'
+#BSUB -M 8000                 # sets to 2800MB the per process enforceable memory limit.
+#BSUB -R 'rusage[mem=8000]'
 #BSUB -W 1:00                 # sets to 240 hours the job's runtime wall-clock limit.
 #BSUB -u gustapia06@tamu.edu # sends email to the specified address (e.g., netid@tamu.edu)
 #BSUB -B -N
