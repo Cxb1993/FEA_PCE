@@ -20,7 +20,7 @@ T_boil = 3315; %[K]Ti64
 T_crit = T_boil*0.95; %Critical temperature at which significant evaporation occurs (arbitrary offset)
 
 for T_melt = temps
-    a = dir(['sweep',num2str(k),'__*.mph']);
+    a = dir(['sweep',num2str(k),'_mod_*.mph']);
     results = struct('length',[],'width',[],'depth',[],'power',[],'speed',[]);
     for i = 1:size(a,1) % main loop through all model files
         [~, cmdout] = system('free -m');
@@ -33,7 +33,7 @@ for T_melt = temps
             import com.comsol.model.util.*
             clear Ttemp data2 g x y z
         end
-        model = mphopen(a(i).name);
+        model = mphload(a(i).name);
         [power, ~] = mphevaluate(model,'beam_p'); %can use unit as string in second output
         [speed, ~] = mphevaluate(model,'beam_v');
         [beamD, ~] = mphevaluate(model,'beam_dia');
@@ -42,8 +42,8 @@ for T_melt = temps
         
         ds = model.result.dataset.create('data1', 'Solution');
         ds.set('solution','sol2');
-        
-        %         data2 = mpheval(model,{'T','ht.tfluxMag','ht.gradTx','ht.gradTz'},'dataset','data1','refine',refine_level
+
+%         data2 = mpheval(model,{'T','ht.tfluxMag','ht.gradTx','ht.gradTz'},'dataset','data1','refine',refine_level
         data2 = mpheval(model,{'T'},'dataset','data1','refine',refine_level);
         t_steps = size(data2.d1,1);
         T_max = max(max(data2.d1));
@@ -169,6 +169,7 @@ for T_melt = temps
             results(i).volume = V(V~=0);
             results(i).q_list = q_list(q_list~=0);
         end
+        results(i).name = a(i).name;
         results(i).n_points = n_points;
         results(i).speed = speed; %*1000;% conversion from [m/s] to [mm/s]
         results(i).power = power;

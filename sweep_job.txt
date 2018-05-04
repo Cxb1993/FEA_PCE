@@ -24,6 +24,8 @@ comsol batch -f ./hostfile.$LSB_JOBID -nn 12 -nnhost 4 -np 5 -inputfile $SWPDIR/
 
 rm -rf ~/.comsol/v53/configuration/comsol*
 
+python changeMPHnames.py $K
+
 comsol mphserver -silent &
 matlab -nodesktop -nodisplay -nosplash -r "clear;postprocess_sweep($K);exit"
 
