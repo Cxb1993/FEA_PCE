@@ -7,7 +7,7 @@
 #
 
 # sweep number
-K=1
+K=2
 
 # name new batch job file and create new job based on template
 BATCHFILE="sweep$K.job"

@@ -6,7 +6,7 @@
 #BSUB -R "span[ptile=20]"     # assigns 20 cores per node.
 #BSUB -M 2560                 # sets to 2800MB the per process enforceable memory limit.
 #BSUB -R 'rusage[mem=2560]'
-#BSUB -W 1:00                 # sets to 240 hours the job's runtime wall-clock limit.
+#BSUB -W 2:00                 # sets to 240 hours the job's runtime wall-clock limit.
 #BSUB -u gustapia06@tamu.edu # sends email to the specified address (e.g., netid@tamu.edu)
 #BSUB -B -N
 #BSUB -P 082789819580

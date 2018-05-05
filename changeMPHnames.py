@@ -7,7 +7,7 @@ K = sys.argv[1]
 wd = os.path.join(os.environ['SCRATCH'],'FEA_PCE','sweep','sweep'+K)
 os.chdir(wd)
 pattern = 'sweep\d+_mods'
-files = [i for i in os.listdir() if re.search(pattern,i)]
+files = [i for i in os.listdir('.') if re.search(pattern,i)]
 
 n = len(files)
 if n == 0:
@@ -23,4 +23,5 @@ else:
 for i in files:
     fn = i.split('_')
     filename = fn[0] + '_mods_' + fn[2].zfill(pad0) + '.mph'
+    print('Renaming file ' + i + ' for ' + filename)
     os.rename(i,filename)
